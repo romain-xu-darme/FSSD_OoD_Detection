@@ -54,7 +54,7 @@ def get_mc_ODIN_score(model, dataloader, magnitude, temperature, std):
 
         with torch.no_grad():
             if magnitude > 0:
-                imgs_p = torch.add(imgs.data, -magnitude, gradient)
+                imgs_p = torch.add(imgs.data, gradient, alpha=-magnitude)
             else:
                 imgs_p = imgs
 
@@ -124,7 +124,7 @@ def get_ODIN_score(model, dataloader, magnitude, temperature, std):
 
         with torch.no_grad():
             if magnitude > 0:
-                imgs_p = torch.add(imgs.data, -magnitude, gradient)
+                imgs_p = torch.add(imgs.data, gradient, alpha=-magnitude)
             else:
                 imgs_p = imgs
             logits = model(imgs_p)

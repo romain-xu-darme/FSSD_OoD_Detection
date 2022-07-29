@@ -161,7 +161,7 @@ def get_Mahalanobis_score(model, dataloader, num_classes, sample_mean, precision
             gradient.index_copy_(1, torch.LongTensor([0]).cuda(), gradient.index_select(1, torch.LongTensor([0]).cuda()) / std[0])
 
 
-        tempInputs = torch.add(imgs.data, -magnitude, gradient)
+        tempInputs = torch.add(imgs.data, gradient, alpha=-magnitude)
         with torch.no_grad():
             try:
                 noise_out_features = model.intermediate_forward(tempInputs, layer_index)

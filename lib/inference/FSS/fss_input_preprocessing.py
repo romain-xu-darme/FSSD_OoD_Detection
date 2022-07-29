@@ -102,7 +102,7 @@ def get_FSS_score_process(model, dataloader, fss, layer_index, magnitude, std):
         elif len(std) == 1:
             gradient.index_copy_(1, torch.LongTensor([0]).cuda(), gradient.index_select(1, torch.LongTensor([0]).cuda()) / std[0])
 
-        tempInputs = torch.add(imgs.data, magnitude, gradient)
+        tempInputs = torch.add(imgs.data, gradient, alpha=magnitude)
         with torch.no_grad():
             try:
                 feat = model.intermediate_forward(tempInputs, layer_index)
