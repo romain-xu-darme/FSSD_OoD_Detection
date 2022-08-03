@@ -193,10 +193,10 @@ class ResNet(nn.Module):
         x = torch.flatten(x, 1)
         x = self.fc(x)
         return x
-    
+
     def mean_feat_list(self, x):
         out_list = []
-        out = self.relu(self.bn1(self.conv1(x)))
+        out = self.maxpool(self.relu(self.bn1(self.conv1(x))))
         out_list.append(out.contiguous().view(out.size(0), -1).mean(dim=0, keepdim=True))
         out = self.layer1(out)
         out_list.append(out.contiguous().view(out.size(0), -1).mean(dim=0, keepdim=True))
@@ -216,7 +216,7 @@ class ResNet(nn.Module):
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
-        # x = self.maxpool(x)
+        x = self.maxpool(x)
         out_list.append(x.contiguous().view(x.size(0), -1))
         x = self.layer1(x)
         out_list.append(x.contiguous().view(x.size(0), -1))
@@ -231,6 +231,23 @@ class ResNet(nn.Module):
         x = torch.flatten(x, 1)
         x = self.fc(x)
         return x, out_list
+
+    def nonflat_feature_list(self, x):
+        out_list = []
+        out = self.maxpool(self.relu(self.bn1(self.conv1(x))))
+        out_list.append(out)
+        out = self.layer1(out)
+        out_list.append(out)
+        out = self.layer2(out)
+        out_list.append(out)
+        out = self.layer3(out)
+        out_list.append(out)
+        out = self.layer4(out)
+        out_list.append(out)
+        out = self.avgpool(out)
+        out = torch.flatten(out, 1)
+        out = self.fc(out)
+        return out, out_list
 
     def intermediate_forward(self, x, layer_index):
         x = self.conv1(x)
