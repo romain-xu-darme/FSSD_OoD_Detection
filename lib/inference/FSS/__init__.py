@@ -62,7 +62,8 @@ def search_FSS_hyperparams(model,
                             ood_dataloader_val_for_test, 
                             std):
     # magnitude_list = [0.0, 0.01, 0.005, 0.002, 0.0014, 0.001, 0.0005]
-    magnitude_list = [0.2, 0.18, 0.16, 0.14, 0.12, 0.1, 0.08, 0.06, 0.04, 0.02, 0.01, 0.008, 0.006, 0.004, 0.002, 0.001, 0.0008, 0.0006, 0.0004, 0.0002, 0.0001, 0.0]
+    #magnitude_list = [0.2, 0.18, 0.16, 0.14, 0.12, 0.1, 0.08, 0.06, 0.04, 0.02, 0.01, 0.008, 0.006, 0.004, 0.002, 0.001, 0.0008, 0.0006, 0.0004, 0.0002, 0.0001, 0.0]
+    magnitude_list = [0.1, 0.05, 0.01, 0.005, 0.001, 0.0005, 0.0001, 0.0]
     best_magnitude = None
     best_tnr = 0
     for m in tqdm(magnitude_list, desc="magnitude"):
@@ -74,7 +75,7 @@ def search_FSS_hyperparams(model,
         
         lr = train_lr(ind_features_val_for_train, ood_features_val_for_train)
         metrics = get_metrics(lr, ind_features_val_for_test, ood_features_val_for_test, acc_type="best")
-        print("m:{}, metrics:{}".format(m, metrics))
+        #print("m:{}, metrics:{}".format(m, metrics))
         if metrics['TNR@tpr=0.95'] > best_tnr:
             best_tnr = metrics['TNR@tpr=0.95']
             best_magnitude = m

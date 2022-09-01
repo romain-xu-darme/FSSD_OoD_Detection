@@ -197,8 +197,8 @@ def get_metrics(lr, ind_features_test, ood_features_test, acc_type="lr"):
     ind_scores = lr.predict_proba(ind_features_test)[:,1]
     ood_scores = lr.predict_proba(ood_features_test)[:,1]
     
-    print("mean ind_scores: {}".format(ind_scores.mean()))
-    print("mean ood_scores: {}".format(ood_scores.mean()))
+    #print("mean ind_scores: {}".format(ind_scores.mean()))
+    #print("mean ood_scores: {}".format(ood_scores.mean()))
     
     order = "largest2smallest"  # sort score by largest2smallest
     metrics = {}

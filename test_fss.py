@@ -74,8 +74,8 @@ ind_trainset = get_classification_dataset(
     split="train",
     transform=input_ops[0],
     target_transform=target_ops,
-    download=True,
-    verbose=True,
+    download=False,
+    verbose=False,
 )
 ind_testset = get_classification_dataset(
     name=args.ind_name,
@@ -83,17 +83,17 @@ ind_testset = get_classification_dataset(
     split="test",
     transform=input_ops[0],
     target_transform=target_ops,
-    download=True,
-    verbose=True,
+    download=False,
+    verbose=False,
 )
 ood_valset = get_classification_dataset(
     name=args.val_name,
     root=args.val_location,
-    split=None,
+    split="train",
     transform=input_ops[0],
     target_transform=target_ops,
-    download=True,
-    verbose=True,
+    download=False,
+    verbose=False,
 )
 ood_testset = get_classification_dataset(
     name=args.ood_name,
@@ -101,8 +101,8 @@ ood_testset = get_classification_dataset(
     split="test",
     transform=input_ops[0],
     target_transform=target_ops,
-    download=True,
-    verbose=True,
+    download=False,
+    verbose=False,
 )
 # Get 2x 500 random pairs of elements from the (InD trainset, OoD valset)
 ind_trainloader, ind_valloader, _ = \
@@ -144,28 +144,30 @@ if input_process:
 
 # ----- Calculate FSSD -----
 if not input_process:  # when no input pre-processing is used
-    print('Get FSSD for in-distribution validation data.')
+#    print('Get FSSD for in-distribution validation data.')
     ind_trainfeats = get_FSS_score_ensem(model, ind_trainloader, fss, layer_indexs)
-    print('Get FSSD for OoD validation data.')
+ #   print('Get FSSD for OoD validation data.')
     ood_trainfeats = get_FSS_score_ensem(model, ood_trainloader, fss, layer_indexs)
 
-    print('Get FSSD for in-distribution test data.')
+#    print('Get FSSD for in-distribution test data.')
     ind_testfeats = get_FSS_score_ensem(model, ind_testloader, fss, layer_indexs)
-    print('Get FSSD for OoD test data.')
+#    print('Get FSSD for OoD test data.')
     ood_testfeats = get_FSS_score_ensem(model, ood_testloader, fss, layer_indexs)
 else:  # when input pre-processing is used
-    print('Get FSSD for in-distribution validation data.')
+#    print('Get FSSD for in-distribution validation data.')
     ind_trainfeats = get_FSS_score_ensem_process(model, ind_trainloader, fss, layer_indexs, best_magnitude, std)
-    print('Get FSSD for OoD validation data.')
+#    print('Get FSSD for OoD validation data.')
     ood_trainfeats = get_FSS_score_ensem_process(model, ood_trainloader, fss, layer_indexs, best_magnitude, std)
 
-    print('Get FSSD for in-distribution test data.')
+#    print('Get FSSD for in-distribution test data.')
     ind_testfeats = get_FSS_score_ensem_process(model, ind_testloader, fss, layer_indexs, best_magnitude, std)
-    print('Get FSSD for OoD test data.')
+#    print('Get FSSD for OoD test data.')
     ood_testfeats = get_FSS_score_ensem_process(model, ood_testloader, fss, layer_indexs, best_magnitude, std)
 
 # ----- Training OoD detector using validation data -----
 lr = train_lr(ind_trainfeats, ood_trainfeats)
 
 metrics = get_metrics(lr, ind_testfeats, ood_testfeats, acc_type="best")
-print("metrics:", metrics)
+print(f"{args.ind_name} v {args.ood_name} ({args.val_name}): AUROC={metrics['AUROC']*100}, AUPR={metrics['AUIN']*100}, FPR80={metrics['FPR@tpr=0.8']}")
+metrics = get_metrics(lr, ind_testfeats, ood_testfeats[:len(ind_testfeats)], acc_type="best")
+print(f"CHEAT {args.ind_name} v {args.ood_name} ({args.val_name}): AUROC={metrics['AUROC']*100}, AUPR={metrics['AUIN']*100}, FPR80={metrics['FPR@tpr=0.8']}")
